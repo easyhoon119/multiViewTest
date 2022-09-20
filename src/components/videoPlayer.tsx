@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import ReactPlayer from "react-player";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface VideoProps {
     setDummy: React.Dispatch<any>;
@@ -8,13 +8,36 @@ interface VideoProps {
     index: number;
     nowTime?: number;
     controls: boolean;
+    setNowIndex?: React.Dispatch<React.SetStateAction<number>>;
+    nowPlaying: boolean;
+    setNowPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function VideoPlayer({ url, setDummy, index, nowTime, controls }: VideoProps) {
+function VideoPlayer({
+    url,
+    setDummy,
+    index,
+    nowTime,
+    controls,
+    setNowIndex,
+    nowPlaying,
+    setNowPlaying,
+}: VideoProps) {
     const nowVideo = useRef<ReactPlayer>(null);
 
     const onChangeVideoArray = (e: React.RefObject<ReactPlayer>) => {
         setDummy({ url, nowTime: e.current?.getCurrentTime() });
+        if (setNowIndex) {
+            setNowIndex(() => index);
+        }
+    };
+
+    const onPauseVideo = () => {
+        setNowPlaying(false);
+    };
+
+    const onPlayingVideo = () => {
+        setNowPlaying(true);
     };
 
     useEffect(() => {
@@ -30,11 +53,13 @@ function VideoPlayer({ url, setDummy, index, nowTime, controls }: VideoProps) {
                 url={url}
                 width="100%"
                 height="100%"
-                playing={true}
+                playing={nowPlaying}
                 muted
                 onClick={() => {
                     onChangeVideoArray(nowVideo);
                 }}
+                onPause={onPauseVideo}
+                onPlay={onPlayingVideo}
                 playsinline={true}
                 ref={nowVideo}
                 controls={controls}

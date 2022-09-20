@@ -1,22 +1,17 @@
-import { useRef, useState } from "react";
-import styled from "styled-components";
+import { useState } from "react";
 import { MockUpPlayerContainerStyle } from "./common/styles";
 import VideoPlayer from "./videoPlayer";
 import video1 from "../assets/videoplayback1.mp4";
 import video2 from "../assets/videoplayback2.mp4";
 import video3 from "../assets/videoplayback3.mp4";
+import NowPlayBox from "./common/nowPlayBox";
 
 function MultiVideoBox() {
     const [firstVideo, setFirstVideo] = useState({ url: video1, nowTime: 0 });
+    const [nowIndex, setNowIndex] = useState(0);
+    const [nowPlaying, setNowPlaying] = useState(true);
 
-    const [dummy, setDummy] = useState([
-        video1,
-        video2,
-        video3,
-        video1,
-        video2,
-        video3,
-    ]);
+    const dummy = [video1, video2, video3, video1, video2, video3];
 
     return (
         <MockUpPlayerContainerStyle>
@@ -27,6 +22,8 @@ function MultiVideoBox() {
                     index={0}
                     nowTime={firstVideo.nowTime}
                     controls={true}
+                    nowPlaying={nowPlaying}
+                    setNowPlaying={setNowPlaying}
                 />
             </div>
             <div className="select-video">
@@ -38,7 +35,15 @@ function MultiVideoBox() {
                                 url={item}
                                 index={index}
                                 controls={false}
+                                setNowIndex={setNowIndex}
+                                nowPlaying={nowPlaying}
+                                setNowPlaying={setNowPlaying}
                             />
+                            {nowIndex === index ? (
+                                <NowPlayBox isLive="video" />
+                            ) : (
+                                ""
+                            )}
                         </div>
                     ))}
                 </>
