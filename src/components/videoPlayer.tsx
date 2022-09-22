@@ -6,11 +6,14 @@ interface VideoProps {
     setDummy: React.Dispatch<any>;
     url: string;
     index: number;
-    nowTime?: number;
+    nowTime: number;
     controls: boolean;
     setNowIndex?: React.Dispatch<React.SetStateAction<number>>;
     nowPlaying: boolean;
     setNowPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+    role: string;
+    playbackRate: number;
+    setPlaybackRate: React.Dispatch<React.SetStateAction<number>>;
 }
 
 function VideoPlayer({
@@ -22,11 +25,14 @@ function VideoPlayer({
     setNowIndex,
     nowPlaying,
     setNowPlaying,
+    role,
+    playbackRate,
+    setPlaybackRate,
 }: VideoProps) {
     const nowVideo = useRef<ReactPlayer>(null);
 
     const onChangeVideoArray = (e: React.RefObject<ReactPlayer>) => {
-        setDummy({ url, nowTime: e.current?.getCurrentTime() });
+        setDummy({ url, nowTime: e.current?.getCurrentTime(), role: "change" });
         if (setNowIndex) {
             setNowIndex(() => index);
         }
@@ -41,7 +47,7 @@ function VideoPlayer({
     };
 
     useEffect(() => {
-        if (nowTime) {
+        if (nowTime && role === "seek") {
             nowVideo.current?.seekTo(nowTime, "seconds");
         }
     }, [nowTime]);
@@ -61,6 +67,15 @@ function VideoPlayer({
                 onPause={onPauseVideo}
                 onPlay={onPlayingVideo}
                 playsinline={true}
+                onSeek={(seconds) => {
+                    controls &&
+                        setDummy({ url, nowTime: seconds, role: "seek" });
+                }}
+                pip={true}
+                onPlaybackRateChange={(playbackRate: number) => {
+                    controls && setPlaybackRate(playbackRate);
+                }}
+                playbackRate={playbackRate}
                 ref={nowVideo}
                 controls={controls}
                 style={{ cursor: "pointer", objectFit: "fill" }}

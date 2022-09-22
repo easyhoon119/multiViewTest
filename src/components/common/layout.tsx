@@ -19,7 +19,7 @@ const LayoutStyle = styled.div`
     max-width: 1500px;
     height: 100%;
     margin: 0 auto;
-    padding: 0 3rem;
+    /* padding: 0 1rem; */
 `;
 
 export default Layout;

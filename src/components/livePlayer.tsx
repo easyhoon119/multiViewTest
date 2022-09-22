@@ -1,12 +1,9 @@
 import THEOLivePlayer from "@theolive/player";
 import { useEffect, useRef } from "react";
-import NowPlayBox from "./common/nowPlayBox";
-import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { MainLiveAction } from "store/mainLiveReducers";
 import { useSelector } from "react-redux";
-import { stat } from "fs";
+import { useDispatch } from "react-redux";
 import { RootReducerType } from "store";
+import { MainLiveAction } from "store/mainLiveReducers";
 
 interface LivePlayerProps {
     className: string;
@@ -19,6 +16,8 @@ interface LivePlayerProps {
         }>
     >;
     firstLive?: number;
+    setIsFullScreen: React.Dispatch<React.SetStateAction<boolean>>;
+    isFullScreen: boolean;
 }
 
 function LivePlayer({
@@ -27,6 +26,8 @@ function LivePlayer({
     setFirstLive,
     index,
     firstLive,
+    setIsFullScreen,
+    isFullScreen,
 }: LivePlayerProps) {
     const liveBox = useRef<HTMLDivElement>(null);
     const dispatch = useDispatch();
@@ -35,14 +36,25 @@ function LivePlayer({
     );
 
     useEffect(() => {
-        const player = new THEOLivePlayer(channelId, true);
+        const player = new THEOLivePlayer(channelId, false);
         player.style.width = "100%";
         player.style.height = "100%";
         player.style.cursor = "pointer";
 
         if (liveBox.current) {
+            if (firstLive === index) {
+                dispatch(
+                    MainLiveAction({
+                        mainPlayer: player,
+                    })
+                );
+            }
             liveBox.current.prepend(player);
         }
+
+        return () => {
+            player.destroy();
+        };
     }, [channelId]);
 
     const onChangeFirstLive = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -51,13 +63,38 @@ function LivePlayer({
         }
     };
 
+    const onChangeFullScreen = () => {
+        setIsFullScreen((prev) => !prev);
+    };
+
     return (
         <>
             <div
                 className={`${firstLive === index ? "nowPlayLive" : className}`}
                 onClick={onChangeFirstLive}
+                ref={liveBox}
             >
-                <LiveItemStyle ref={liveBox}></LiveItemStyle>
+                {firstLive === index ? (
+                    <div
+                        className="fullscreen-icon"
+                        style={{
+                            width: "50px",
+                            height: "50px",
+                            position: "absolute",
+                            bottom: "0.5%",
+                            right: "0.2%",
+                            fontSize: "2rem",
+                            fontWeight: "700",
+                            zIndex: "9999999999999999999999999999999999999",
+                            color: "rgba(255, 255, 255, 0.5)",
+                        }}
+                        onClick={onChangeFullScreen}
+                    >
+                        {isFullScreen ? "] [" : "[ ]"}
+                    </div>
+                ) : (
+                    ""
+                )}
                 <div
                     style={{
                         position: "absolute",
@@ -72,15 +109,8 @@ function LivePlayer({
                 >
                     {index}
                 </div>
-                {/* {firstLive === index ? <NowPlayBox /> : ""} */}
             </div>
         </>
     );
 }
-
-const LiveItemStyle = styled.div`
-    width: 100%;
-    height: 100%;
-`;
-
 export default LivePlayer;
