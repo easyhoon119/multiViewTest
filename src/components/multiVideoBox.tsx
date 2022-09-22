@@ -15,8 +15,17 @@ function MultiVideoBox() {
     const [nowIndex, setNowIndex] = useState(0);
     const [nowPlaying, setNowPlaying] = useState(false);
     const [playbackRate, setPlaybackRate] = useState(1);
+    const [buffered, setBuffered] = useState(false);
+    const [seconds, setSeconds] = useState(0);
 
-    const dummy = [video1, video2, video3, video1, video2, video3];
+    const dummy = [
+        "https://redlabmcdn.s.llnwi.net/st01/content/going/vod/62677380d0c685ea2a274b39/62677380d0c685ea2a274b39_1_20220426_132036.m3u8",
+        "https://redlabmcdn.s.llnwi.net/st01/content/going/vod/62677380d0c685ea2a274b39/62677380d0c685ea2a274b39_2_20220426_132036.m3u8",
+        "https://redlabmcdn.s.llnwi.net/st01/content/going/vod/62677380d0c685ea2a274b39/62677380d0c685ea2a274b39_3_20220426_132036.m3u8",
+        "https://redlabmcdn.s.llnwi.net/st01/content/going/vod/62677380d0c685ea2a274b39/62677380d0c685ea2a274b39_4_20220426_132036.m3u8",
+        "https://redlabmcdn.s.llnwi.net/st01/content/going/vod/62677380d0c685ea2a274b39/62677380d0c685ea2a274b39_5_20220426_132036.m3u8",
+        "https://redlabmcdn.s.llnwi.net/st01/content/going/vod/62677380d0c685ea2a274b39/62677380d0c685ea2a274b39_6_20220426_132036.m3u8",
+    ];
 
     useEffect(() => {
         setNowPlaying(true);
@@ -53,6 +62,9 @@ function MultiVideoBox() {
                                     role={firstVideo.role}
                                     playbackRate={playbackRate}
                                     setPlaybackRate={setPlaybackRate}
+                                    setBuffered={setBuffered}
+                                    seconds={seconds}
+                                    setSeconds={setSeconds}
                                 />
                             </div>
                             {nowIndex === index ? (

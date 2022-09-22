@@ -11,9 +11,12 @@ interface VideoProps {
     setNowIndex?: React.Dispatch<React.SetStateAction<number>>;
     nowPlaying: boolean;
     setNowPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+    setBuffered: React.Dispatch<React.SetStateAction<boolean>>;
     role: string;
     playbackRate: number;
     setPlaybackRate: React.Dispatch<React.SetStateAction<number>>;
+    seconds: number;
+    setSeconds: React.Dispatch<React.SetStateAction<number>>;
 }
 
 function VideoPlayer({
@@ -28,6 +31,9 @@ function VideoPlayer({
     role,
     playbackRate,
     setPlaybackRate,
+    setBuffered,
+    seconds,
+    setSeconds,
 }: VideoProps) {
     const nowVideo = useRef<ReactPlayer>(null);
 
@@ -50,7 +56,7 @@ function VideoPlayer({
         if (nowTime && role === "seek") {
             nowVideo.current?.seekTo(nowTime, "seconds");
         }
-    }, [nowTime]);
+    }, [nowTime, role]);
 
     return (
         <VideoPlayerStyle controls={controls}>
@@ -65,15 +71,26 @@ function VideoPlayer({
                     onChangeVideoArray(nowVideo);
                 }}
                 onPause={onPauseVideo}
+                onError={(err, data) => {
+                    console.log(`${err} ${data}`);
+                }}
                 onPlay={onPlayingVideo}
                 playsinline={true}
                 onSeek={(seconds) => {
-                    controls &&
-                        setDummy({ url, nowTime: seconds, role: "seek" });
+                    controls && setSeconds(seconds);
                 }}
                 pip={true}
                 onPlaybackRateChange={(playbackRate: number) => {
                     controls && setPlaybackRate(playbackRate);
+                }}
+                config={{
+                    file: {
+                        forceHLS: true,
+                    },
+                }}
+                onBuffer={() => {
+                    controls &&
+                        setDummy({ url, nowTime: seconds, role: "seek" });
                 }}
                 playbackRate={playbackRate}
                 ref={nowVideo}
