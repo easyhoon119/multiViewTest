@@ -42,7 +42,7 @@ function LivePlayer({
         player.style.cursor = "pointer";
 
         if (liveBox.current) {
-            if (firstLive === index) {
+            if (index === 0) {
                 dispatch(
                     MainLiveAction({
                         mainPlayer: player,
@@ -67,6 +67,19 @@ function LivePlayer({
         setIsFullScreen((prev) => !prev);
     };
 
+    const onMuted = () => {
+        if (mainPlayer) {
+            mainPlayer.muted = !mainPlayer.muted;
+            console.log(mainPlayer.volume);
+        }
+    };
+
+    const onSoundDown = () => {
+        if (mainPlayer) {
+            mainPlayer.volume = mainPlayer.volume - 0.2;
+        }
+    };
+
     return (
         <>
             <div
@@ -78,19 +91,23 @@ function LivePlayer({
                     <div
                         className="fullscreen-icon"
                         style={{
-                            width: "50px",
                             height: "50px",
                             position: "absolute",
+                            display: "flex",
                             bottom: "0.5%",
-                            right: "0.2%",
+                            right: "3%",
                             fontSize: "2rem",
                             fontWeight: "700",
+                            gap: "15px",
                             zIndex: "9999999999999999999999999999999999999",
                             color: "rgba(255, 255, 255, 0.5)",
                         }}
-                        onClick={onChangeFullScreen}
                     >
-                        {isFullScreen ? "] [" : "[ ]"}
+                        <div onClick={onMuted}>🔊</div>
+                        <div onClick={onSoundDown}>down</div>
+                        <div onClick={onChangeFullScreen}>
+                            {isFullScreen ? "🔳" : "🔲"}
+                        </div>
                     </div>
                 ) : (
                     ""

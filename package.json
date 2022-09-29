@@ -1,8 +1,15 @@
 {
-    "name": "videomockup",
-    "version": "0.1.0",
-    "private": true,
-    "homepage": ".",
+    "name": "@easy/test-videomockup",
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "browser": "./browser/specific/main.js",
+    "license": "staby",
+    "babel": {
+        "preset": [
+            "@babel/preset-react"
+        ]
+    },
     "dependencies": {
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.4.0",
@@ -17,6 +24,7 @@
         "react-dom": "^18.2.0",
         "react-player": "^2.11.0",
         "react-redux": "^8.0.2",
+        "react-responsive": "^9.0.0",
         "react-router-dom": "^6.3.0",
         "react-scripts": "5.0.1",
         "redux": "^4.2.0",
@@ -29,7 +37,8 @@
         "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "prepare": "rm -rf dist && mkdir dist && tsc"
     },
     "eslintConfig": {
         "extends": [
@@ -50,6 +59,8 @@
         ]
     },
     "devDependencies": {
+        "@babel/cli": "^7.19.3",
+        "@babel/preset-react": "^7.18.6",
         "@types/styled-components": "^5.1.26",
         "@types/video-react": "^0.15.1"
     }

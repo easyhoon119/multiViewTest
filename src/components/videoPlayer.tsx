@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/lazy";
 import { useEffect, useRef } from "react";
 
 interface VideoProps {
@@ -9,14 +9,25 @@ interface VideoProps {
     nowTime: number;
     controls: boolean;
     setNowIndex?: React.Dispatch<React.SetStateAction<number>>;
+    nowIndex: number;
     nowPlaying: boolean;
     setNowPlaying: React.Dispatch<React.SetStateAction<boolean>>;
     setBuffered: React.Dispatch<React.SetStateAction<boolean>>;
+    buffered: boolean;
     role: string;
     playbackRate: number;
     setPlaybackRate: React.Dispatch<React.SetStateAction<number>>;
     seconds: number;
     setSeconds: React.Dispatch<React.SetStateAction<number>>;
+    setfummy: React.Dispatch<
+        React.SetStateAction<
+            {
+                id: number;
+                state: boolean;
+                url: string;
+            }[]
+        >
+    >;
 }
 
 function VideoPlayer({
@@ -26,19 +37,21 @@ function VideoPlayer({
     nowTime,
     controls,
     setNowIndex,
+    nowIndex,
     nowPlaying,
     setNowPlaying,
     role,
     playbackRate,
     setPlaybackRate,
     setBuffered,
+    buffered,
     seconds,
     setSeconds,
+    setfummy,
 }: VideoProps) {
     const nowVideo = useRef<ReactPlayer>(null);
 
     const onChangeVideoArray = (e: React.RefObject<ReactPlayer>) => {
-        setDummy({ url, nowTime: e.current?.getCurrentTime(), role: "change" });
         if (setNowIndex) {
             setNowIndex(() => index);
         }
@@ -52,6 +65,28 @@ function VideoPlayer({
         setNowPlaying(true);
     };
 
+    const onSeekingvideo = (currentTime: any) => {
+        setfummy((prev) =>
+            prev.map((item) =>
+                item.url === url ? { ...item, state: false } : item
+            )
+        );
+
+        setDummy({
+            url,
+            nowTime: currentTime,
+            role: "seek",
+        });
+    };
+
+    const onSeekedVideo = () => {
+        setfummy((prev) =>
+            prev.map((item) =>
+                item.url === url ? { ...item, state: true } : item
+            )
+        );
+    };
+
     useEffect(() => {
         if (nowTime && role === "seek") {
             nowVideo.current?.seekTo(nowTime, "seconds");
@@ -60,7 +95,6 @@ function VideoPlayer({
 
     return (
         <VideoPlayerStyle controls={controls}>
-            {/* <div className="wrap-video" onClick={onChangeVideoArray}></div> */}
             <ReactPlayer
                 url={url}
                 width="100%"
@@ -72,13 +106,10 @@ function VideoPlayer({
                 }}
                 onPause={onPauseVideo}
                 onError={(err, data) => {
-                    console.log(`${err} ${data}`);
+                    console.log(`${err}`);
                 }}
                 onPlay={onPlayingVideo}
                 playsinline={true}
-                onSeek={(seconds) => {
-                    controls && setSeconds(seconds);
-                }}
                 pip={true}
                 onPlaybackRateChange={(playbackRate: number) => {
                     controls && setPlaybackRate(playbackRate);
@@ -86,11 +117,16 @@ function VideoPlayer({
                 config={{
                     file: {
                         forceHLS: true,
+                        attributes: {
+                            preload: "none",
+                            onSeeking: (seconds: any) => {
+                                onSeekingvideo(seconds.target.currentTime);
+                            },
+                            onCanPlayThrough: () => {
+                                onSeekedVideo();
+                            },
+                        },
                     },
-                }}
-                onBuffer={() => {
-                    controls &&
-                        setDummy({ url, nowTime: seconds, role: "seek" });
                 }}
                 playbackRate={playbackRate}
                 ref={nowVideo}
